@@ -1,0 +1,198 @@
+
+This is a C++ implementation of the push programming language. 
+
+The src directory contains the language itself including the basic interpreter
+called 'runpush'. The examples directory contains an example application of the
+push language to solve integer 'symbolic regression'. This executable is called
+pushgp_int and will read in a configuration file and runs a genetic programming
+system to solve an integer input/output relationship.
+
+The authorative definition of the push language can be found at Lee Spectors Push
+pages.
+
+========= Code  ======================
+
+Code is based on lisp-style S-expressions, but instead of being implemented as cons-pairs,
+they're stacks (vectors) of code. The typename Code is actually a shared_ptr to a CodeBase
+class. The memory management scheme is thus reference counted.
+
+The inheritency diagram for CodeBase falls down in:
+	    
+	   CodeList
+	 /
+	/    
+CodeBase
+	\
+	 \
+	   CodeAtom:
+			- Literal<T>
+			- Instruction
+
+
+Literals being constants such as integers, double, floats and the like, and
+instructions, the Push instructions
+
+======== Names =======================
+
+Names are a bit of a special beast. Everything that cannot be parsed will end up as
+a name. These strings for these names are stored globally, and references to these globally
+stored names are passed around in code and envs. Names are also shared_ptrs, but because
+they can refer to themselves (and thus form cycles), they are garbage collected. This
+is done through the function 'collect_garbage' defined in Word.h. Functions 'get_code' and
+'set_code' (also from Word.h) are used to obtain or associate code to names.
+
+========= Environments ===============
+
+The central storage for data is the Environment, called Env for short. This
+storage holds all information that is necessary to run push. It holds stacks,
+execution information and a local binding space for names. If you have set up an
+Env, and want to run some arbitrary code in it, don't do this directly! The code
+could change names, rendering predefined functions useless. The best way is to make
+a copy of the Env and use that one, thus:
+
+Env env;
+setup(env);
+
+Env workEnv = env;
+push_call(workEnv, arbitrary_code);
+workEnv.go(1000); // run for 1000 'steps'
+
+
+Currently there are several kinds of stacks:
+
+Execution Stack 
+Integer   Stack
+Code      Stack
+Boolean   Stack
+Float     Stack
+Name      Stack
+
+
+The execution stack is a special beast and new since push3. Instead of doing a recursive lisp-style
+execution of a piece of code, the execution stack breaks up the execution in neat little chunks,
+so that execution can be easily interrupted and resumed at will. Push3 supports a pop/execute iteration
+instead of a recursion. It will pop the topmost piece of code, and execute that piece of code.
+If the code is a list of code, it will simply unwrap itself and push all its code on the execution
+stack. This enables a few fairly elegant implementations of push functions:
+
+CODE.QUOTE: pop item from execution stack, push on code stack
+CODE.DO*: pop item from code stack, push on execution stack
+
+And also allows combinators and iterators to be easily defined.
+
+======== Instructions ================
+
+An instruction can be defined as a simple function that takes an Env and produces an unsigned (the effort
+of executing this instruction. This is currently not used):
+
+Example:
+
+unsigned addInteger(Env& env) {
+    push<int>(env, pop<int>(env) + pop<int>(env));
+    return 1;
+}
+
+To make this function known to the system, this function needs to be added in the initialization phase
+of the push engine. Create an initialization function containing:
+
+void initMyInstructions() {
+    
+    make_instruction( addInteger, "INTEGER.ADD", integerType + integerType, integerType);
+
+}
+
+And call initMyInstructions() in the beginning of your code.
+
+The first argument of make_instruction gives the function pointer to push, the second defines its
+internal name, the third condition defines the precondition (it needs two integers on the stack), while
+the third defines the postcondition (it pushes one integer back on the stack). The instruction will
+now only execute whenever two integers are on the stack.
+
+integerType is predefined (in TypeDef.h) and is an array of integers with only the 'integer' element
+set to 1 (this is Stack 1 in the current implementation). Adding 'Types' will add the arrays elementwise:
+integerType + floatType for instance designates a precondition that will only be true when there is at least
+one integer and one float present on the stacks. 
+
+========= Modifying Environments =============
+
+A special set of instructions is available that allows you to configure the environment, including
+the function set. These instructions are generally prefixed with 'ENV.'. An instruction such at
+ENV.INSTRUCTIONS will get the top of the code stack, and will make that list the instruction set for
+the 'next' environment.
+
+Every environment has a 'next()' member function, which will return a stored environment, and if it
+doesn't exist, creates a fresh clone of itself (using the virtual function clone()). The ENV instructions will modify the parameters of 
+this Env::next() environment and probably make it ready to run evolved code. It is thus important that
+after configuration, the user will use the 'next' environment instead of the environment that ran the
+configuration code.
+
+If ENV instructions leak into the function set, no real harm is done, as this might merely misconfigure the
+next environment of the Env.
+
+Thus, given that a configuration program is stored in a variable called 'prog', the following snippet will configure
+and enviroments:
+
+Env env;
+env.configure(parse(prog));
+run(env.next());
+
+where run is understood to be the main run that will take an Env as the Env to use for evaluation. This env is
+now configured according to prog.
+
+
+=========== Defining extended Environments =============
+
+To define new stacks, you can subclass the Env class. An example of this can be found in extension/PointExtension.h.
+To define a new stack the following needs to be done:
+
+o Define the C++-type of the new item. This must be a new type.
+Example:
+    typedef valarray<double> point_t;
+
+o Define the stack index for the new type, and specialize the 'get_stack_num' function (from TypeDef.h)
+Example:
+    const int POINT_STACK = LAST_STANDARD_STACK+1;
+    template <> inline size_t get_stack_num<point_t>()         { return POINT_STACK; }
+
+This will enable the internal accounting to associate the new stack with this index. LAST_STANDARD_STACK
+is defined to be the last stack that is used for the default Env.
+
+o Optionally, define the push 'Type' for the new stack, this is a vector with only the 'POINT_STACK'th element
+set to 1
+Example:
+    Type pointType = make_type<point_t>();
+
+o Create a class that inherits from Env. Add a (public) data member for your new stack
+Example:
+    vector<point_t> point_stack;
+    
+
+o Implement the virtual functions (see PointExtension):
+    - Constructors, destructors, operator=
+    - clone
+    - clear_stacks
+    - get_stack_size
+    - make_type
+    - pop_stack_from_id
+
+o Finally, implement a specialization of get_stack<> for your new type, top, pop, push are all defined using
+this specialization
+Example:
+    - 
+    template <> std::vector< point_t >& get_stack(Env& env) {
+        return static_cast<PointEnv&>(env).point_stack;
+	}
+	
+o If necessary (if there are no default implementations available for you type) specialize the template 
+functions:
+    - operator<<(ostream&, point_t point); // replace point_t with your type
+    - template <> bool does_equal<point_t>(const point_t& a, const point_t& b) // equality check
+
+Now you can add your own instructions to manipulate this new environment. Check PointExtension for examples.
+			    
+
+
+
+
+
+

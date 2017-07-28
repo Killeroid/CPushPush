@@ -1,0 +1,12 @@
+AC_INIT
+AC_CONFIG_SRCDIR([configure.in])
+
+AC_CONFIG_HEADERS([config.h])
+AM_INIT_AUTOMAKE(push, 3.1.0)
+
+AC_LANG([C++])
+AC_PROG_CXX
+AC_PROG_LIBTOOL
+
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile examples/Makefile])
+AC_OUTPUT

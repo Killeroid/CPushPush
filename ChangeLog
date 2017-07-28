@@ -1,0 +1,41 @@
+30 Sep 2004
+
+Implemented the max_points_in_program constraint (finally). This had
+some repercusions for the parsing, as suddenly a configuration file
+could in principle be too long. This lead to the solution to configure the
+'next' environment instead of the current. So, from now on, when you want
+to configure an environment, it works like this:
+
+Env root;
+root.configure(parse(configfilecontents));
+
+Env& env = root.next(); // next is now configured.
+
+
+28 Aug 2004
+
+Removed make_default_env. Uses 'Env::clone' from now on.
+
+Resolved issues with linking against a static push-library. All
+instructions will now be linked in by default.
+
+24 Aug 2004
+
+Added pushgp_ramp to re-introduce ramping
+
+Overhauled the execution engine. Much faster now. Exec is now a
+true type with a get_stack<Exec> function. It's a weak_ptr with the
+guard holding the shared pointer.
+
+21 Aug 2004
+
+Cleaned up pushgp_int to use a regular GA
+
+Friday, 13 aug 2004
+
+Added several missing files for the distribution 
+
+mk
+
+
+
