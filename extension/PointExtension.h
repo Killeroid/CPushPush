@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -39,58 +37,62 @@ void initPointInstructions();
 class PointEnv : public Env
 {
     public:
-    vector<point_t> point_stack;
-	
-	PointEnv():Env() { initPointInstructions(); function_set = instructions; };
-    ~PointEnv() {}
-    PointEnv(const PointEnv& other) {
-	operator=(other);	
-    }
+        vector<point_t> point_stack;
+        
+        PointEnv():Env() {
+            initPointInstructions();
+            function_set = instructions;
+        };
+        
+        ~PointEnv() {}
+        PointEnv(const PointEnv& other) {
+            operator=(other);
+        }
 
-    PointEnv& operator=(const PointEnv& other) {
-	Env::operator=(other);
-	point_stack = other.point_stack;
-	return *this;
-    }
+        PointEnv& operator=(const PointEnv& other) {
+            Env::operator=(other);
+            point_stack = other.point_stack;
+            return *this;
+        }
 
-    void force_next() {
-	// this is a hack to force a PointEnv next_env -- for some reason
-	// it was previously creating a regular Env.
-	next_env = 0;
-    	if (next_env == 0) next_env = PointEnv::clone();
-    }
+        void force_next() {
+            // this is a hack to force a PointEnv next_env -- for some reason
+            // it was previously creating a regular Env.
+            next_env = 0;
+            if (next_env == 0) next_env = PointEnv::clone();
+        }
 
-    virtual Env* clone() const { 
-	PointEnv* newenv = new PointEnv(*this);
-	return newenv;
-    }
+        virtual Env* clone() const { 
+            PointEnv* newenv = new PointEnv(*this);
+            return newenv;
+        }
 
-    void clear_stacks() {
-	Env::clear_stacks();
-	point_stack.clear();
-    }
+        void clear_stacks() {
+            Env::clear_stacks();
+            point_stack.clear();
+        }
 
-    unsigned get_stack_size(int which) const {
-	if (which == POINT_STACK) {
-	    return point_stack.size();
-	}
+        unsigned get_stack_size(int which) const {
+            if (which == POINT_STACK) {
+                return point_stack.size();
+            }
 
-	return Env::get_stack_size(which);
-    }
+            return Env::get_stack_size(which);
+        }
 
-    Type make_type() const {
-	return Env::make_type() + Type(POINT_STACK+1, POINT_STACK, point_stack.size());
-    }
-    
-    Code pop_stack_from_id(int id)  {
-	if (id == POINT_STACK) {
-	    point_t val = point_stack.back();
-	    point_stack.pop_back();
-	    return Code(new Literal< point_t >(val));
-	}
-	
-	return Env::pop_stack_from_id(id);
-    }
+        Type make_type() const {
+            return Env::make_type() + Type(POINT_STACK+1, POINT_STACK, point_stack.size());
+        }
+        
+        Code pop_stack_from_id(int id)  {
+            if (id == POINT_STACK) {
+                point_t val = point_stack.back();
+                point_stack.pop_back();
+                return Code(new Literal< point_t >(val));
+            }
+            
+            return Env::pop_stack_from_id(id);
+        }
     
 };
 
@@ -103,9 +105,10 @@ template <> std::vector< point_t >& get_stack(Env& env) {
 // printing 
 std::ostream& operator<<(ostream& os, point_t point) {
     for (unsigned i = 0; i < point.size(); ++i) {
-	os << point[i];
-	if (i != point.size() - 1) os << ':';
+        os << point[i];
+        if (i != point.size() - 1) os << ':';
     }
+    return os;
 }
 // specialization of Literal<point_t> does_equal (valarray overloads '==' differently)
 
@@ -113,7 +116,7 @@ template <>
 bool does_equal<point_t>(const point_t& a, const point_t& b) {
     // probably should use some tolerance here
     for (unsigned i = 0; i < a.size(); ++i) {
-	if (a[i] != b[i]) return false;
+        if (a[i] != b[i]) return false;
     }
     return true;
 }
@@ -126,7 +129,7 @@ std::string print(const PointEnv& env) {
 	
     os << "\t(";
     for (unsigned i = 0; i < env.point_stack.size(); ++i)
-    os << env.point_stack[i];
+        os << env.point_stack[i];
 	os << ' ';
     os << ")\n";
 
@@ -177,6 +180,7 @@ unsigned point_div(Env& env) {
 }
 
 unsigned point_cross(Env& env) {
+    return 1;
 }
 
 unsigned float_pointdot(Env& env) {
@@ -186,6 +190,7 @@ unsigned float_pointdot(Env& env) {
 	p2 = pop<point_t>(env);
 
 	push(env, p1[0]*p2[0] + p1[1]*p2[1] + p1[2]*p2[2]);
+    return 1;
 }
 
 unsigned point_fromfloat(Env& env) {
@@ -194,6 +199,7 @@ unsigned point_fromfloat(Env& env) {
 	p[0] = p[1] = p[2] = pop<double>(env);
 
 	push(env, p);
+    return 1;
 }
 
 unsigned point_from3floats(Env& env) {
@@ -204,18 +210,22 @@ unsigned point_from3floats(Env& env) {
 	p[0] = pop<double>(env);
 
 	push(env, p);
+    return 1;
 }
 
 unsigned float_frompointx(Env& env) {
 	push(env, pop<point_t>(env)[0]);
+    return 1;
 }
 
 unsigned float_frompointy(Env& env) {
 	push(env, pop<point_t>(env)[1]);
+    return 1;
 }
 
 unsigned float_frompointz(Env& env) {
 	push(env, pop<point_t>(env)[2]);
+    return 1;
 }
 
 unsigned float_frompointxyz(Env& env) {
@@ -224,18 +234,22 @@ unsigned float_frompointxyz(Env& env) {
 	push(env, p[0]);
 	push(env, p[1]);
 	push(env, p[2]);
+    return 1;
 }
 
 unsigned point_setx(Env& env) {
 	top<point_t>(env)[0] = pop<double>(env);
+    return 1;
 }
 
 unsigned point_sety(Env& env) {
 	top<point_t>(env)[1] = pop<double>(env);
+    return 1;
 }
 
 unsigned point_setz(Env& env) {
 	top<point_t>(env)[2] = pop<double>(env);
+    return 1;
 }
 
 unsigned point_length(Env& env) {
@@ -247,6 +261,7 @@ unsigned point_length(Env& env) {
 	}
 
 	push(env, sqrt(total));
+    return 1;
 }
 
 inline unsigned rand_point(Env& env) {
@@ -288,33 +303,33 @@ Code parse_point(std::string atom) {
 }
 
 void initPointInstructions() {
-// add generic instructions
-static Code yd = make_instruction(yankdup<point_t>, "POINT.YANKDUP", integerType + pointType, pointType);
+    // add generic instructions
+    static Code yd = make_instruction(yankdup<point_t>, "POINT.YANKDUP", integerType + pointType, pointType);
 
-// static Code pop = make_instruction(pop<point_t>, "POINT.POP", pointType, nullType);
+    // static Code pop = make_instruction(pop<point_t>, "POINT.POP", pointType, nullType);
 
-static Code pff = make_instruction(point_fromfloat, "POINT.FROMFLOAT", floatType, pointType);
-static Code pf3f = make_instruction(point_from3floats, "POINT.FROM3FLOATS", floatType+floatType+floatType, pointType);
+    static Code pff = make_instruction(point_fromfloat, "POINT.FROMFLOAT", floatType, pointType);
+    static Code pf3f = make_instruction(point_from3floats, "POINT.FROM3FLOATS", floatType+floatType+floatType, pointType);
 
-static Code ffx = make_instruction(float_frompointx, "FLOAT.FROMPOINTX", pointType, floatType);
-static Code ffy = make_instruction(float_frompointy, "FLOAT.FROMPOINTY", pointType, floatType);
-static Code ffz = make_instruction(float_frompointz, "FLOAT.FROMPOINTZ", pointType, floatType);
+    static Code ffx = make_instruction(float_frompointx, "FLOAT.FROMPOINTX", pointType, floatType);
+    static Code ffy = make_instruction(float_frompointy, "FLOAT.FROMPOINTY", pointType, floatType);
+    static Code ffz = make_instruction(float_frompointz, "FLOAT.FROMPOINTZ", pointType, floatType);
 
-static Code ffxyz = make_instruction(float_frompointxyz, "FLOAT.FROMPOINTXYZ", pointType, floatType+floatType+floatType);
+    static Code ffxyz = make_instruction(float_frompointxyz, "FLOAT.FROMPOINTXYZ", pointType, floatType+floatType+floatType);
 
-static Code psx = make_instruction(point_setx, "POINT.SETX", floatType+pointType, nullType);
-static Code psy = make_instruction(point_sety, "POINT.SETY", floatType+pointType, nullType);
-static Code psz = make_instruction(point_setz, "POINT.SETZ", floatType+pointType, nullType);
+    static Code psx = make_instruction(point_setx, "POINT.SETX", floatType+pointType, nullType);
+    static Code psy = make_instruction(point_sety, "POINT.SETY", floatType+pointType, nullType);
+    static Code psz = make_instruction(point_setz, "POINT.SETZ", floatType+pointType, nullType);
 
-static Code add = make_instruction( point_add, "POINT.+", pointType+pointType, pointType);
-static Code sub = make_instruction( point_sub, "POINT.-", pointType+pointType, pointType);
-static Code mul = make_instruction( point_mul, "POINT.*", pointType+floatType, pointType);
-static Code div = make_instruction( point_div, "POINT./", pointType+floatType, pointType);
-static Code length = make_instruction( point_length, "POINT.LENGTH", pointType, floatType);
-static Code rand = make_instruction( rand_point, "POINT.RAND", nullType, pointType);
-static Code erc = make_instruction( rand_point, "POINT.ERC", nullType, pointType);
+    static Code add = make_instruction( point_add, "POINT.+", pointType+pointType, pointType);
+    static Code sub = make_instruction( point_sub, "POINT.-", pointType+pointType, pointType);
+    static Code mul = make_instruction( point_mul, "POINT.*", pointType+floatType, pointType);
+    static Code div = make_instruction( point_div, "POINT./", pointType+floatType, pointType);
+    static Code length = make_instruction( point_length, "POINT.LENGTH", pointType, floatType);
+    static Code rand = make_instruction( rand_point, "POINT.RAND", nullType, pointType);
+    static Code erc = make_instruction( rand_point, "POINT.ERC", nullType, pointType);
 
-static int point_parse = static_initializer.register_parse_hook(parse_point);
+    static int point_parse = static_initializer.register_parse_hook(parse_point);
 
 }
 

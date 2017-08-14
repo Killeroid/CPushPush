@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -45,17 +43,17 @@ class Literal : public TypedAtom
     unsigned operator()(Env& env) const { push<T>(env, value); return 1; }
 
     std::string to_string() const {
-	std::ostringstream os;
-	os.precision(17);
-	os.setf(std::ios_base::showpoint);
-	os << value;
-	return os.str();
+        std::ostringstream os;
+        os.precision(17);
+        os.setf(std::ios_base::showpoint);
+        os << value;
+        return os.str();
     }
     
     T get() const { return value; }
      
     bool equal_to(const CodeBase& other) const { 
-	return does_equal(value, static_cast<const Literal<T>& >(other).value); 
+        return does_equal(value, static_cast<const Literal<T>& >(other).value);
     }
 };
 
@@ -67,11 +65,11 @@ inline std::string Literal<bool>::to_string() const { return value?"TRUE":"FALSE
 template <>
 inline unsigned Literal<name_t>::operator()(Env& env) const { 
     if (env.quote_name_flag) {
-	env.quote_name_flag = false;
-	push<name_t>(env, value);
+        env.quote_name_flag = false;
+        push<name_t>(env, value);
     }
     else {
-	env.push_guarded( get_code(value) );
+        env.push_guarded( get_code(value) );
     }
     
     return 1;

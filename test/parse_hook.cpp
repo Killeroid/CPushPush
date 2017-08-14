@@ -1,7 +1,5 @@
 
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -45,7 +43,7 @@ int main()
 Code parsePI (std::string atom) {
     
     if (atom == "pi" || atom == "PI") {
-	return Code(new Literal<double>(M_PI)); // return literal containing the value PI
+        return Code(new Literal<double>(M_PI)); // return literal containing the value PI
     }
     
     // failed

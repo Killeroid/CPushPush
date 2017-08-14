@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -30,8 +28,8 @@ unsigned _nth(Env& env) {
     int val = pop<int>(env);
 
     if (first->get_stack().size() == 0) { // nil or atom
-	push(env, first);
-	return 1;
+        push(env, first);
+        return 1;
     }
     
     const CodeArray& stack = first->get_stack();

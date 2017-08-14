@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -37,24 +35,25 @@ class Instruction : public TypedAtom {
     bool static_typed_;
     
     public:
-    Instruction(Operator op, std::string name) : op_(op), name_(name) {}
-    Instruction(Operator op, std::string name, Type intype, Type outtype, bool static_ = true) : 
-	op_(op), name_(name), intype_(intype), outtype_(outtype), static_typed_(static_) {}
-    
-    Operator get_op() const { return op_; }
+        Instruction(Operator op, std::string name) : op_(op), name_(name) {}
+        Instruction(Operator op, std::string name, Type intype, Type outtype, bool static_ = true) : 
+        op_(op), name_(name), intype_(intype), outtype_(outtype), static_typed_(static_) {}
+        
+        Operator get_op() const { return op_; }
 
-    const Type& get_precondition() const   { return intype_; }
-    const Type& get_postcondition() const  { return outtype_; }
-    bool is_static() const	    { return static_typed_; }
-    
-    std::string to_string() const { return name_; }
-   
-    virtual bool can_run(const Env& env) const { return intype_.can_pop_from(env); }
-    virtual unsigned operator()(Env& env) const { 
-	if (can_run(env)) op_(env); return 1;} // currently ignores 'effort' 
+        const Type& get_precondition() const   { return intype_; }
+        const Type& get_postcondition() const  { return outtype_; }
+        bool is_static() const	    { return static_typed_; }
+        
+        std::string to_string() const { return name_; }
+       
+        virtual bool can_run(const Env& env) const { return intype_.can_pop_from(env); }
+        virtual unsigned operator()(Env& env) const { 
+            if (can_run(env)) op_(env); return 1;
+        } // currently ignores 'effort'
     
     protected: 
-    bool equal_to(const CodeBase& other) const { return op_ == static_cast<const Instruction&>(other).op_; }
+        bool equal_to(const CodeBase& other) const { return op_ == static_cast<const Instruction&>(other).op_; }
 };
 
 inline

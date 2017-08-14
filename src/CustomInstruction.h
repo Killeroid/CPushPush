@@ -13,21 +13,27 @@ namespace push {
 class CustomInstruction : public Instruction {
 	public:
 
-	CustomInstruction(CustomOperator op, std::string name, void *callbackData):Instruction(NULL, name) { callbackOp_ = op; callbackData_ = callbackData; }
+        CustomInstruction(CustomOperator op, std::string name, void *callbackData):Instruction(NULL, name) {
+            callbackOp_ = op; callbackData_ = callbackData;
+        }
 
-	~CustomInstruction() {
-		// if they provide a callback to free the callback data
-		if(callbackData_ && freeCallbackData_) freeCallbackData_(callbackData_);	
-	}
+        ~CustomInstruction() {
+            // if they provide a callback to free the callback data
+            if(callbackData_ && freeCallbackData_) freeCallbackData_(callbackData_);	
+        }
 
-	unsigned operator()(Env& env) const { callbackOp_(env, callbackData_); return 1; }
+        unsigned operator()(Env& env) const {
+            callbackOp_(env, callbackData_); return 1;
+        }
 
-	void setDataFreeCallback(void (*c)(void *d)) { freeCallbackData_ = c; }
+        void setDataFreeCallback(void (*c)(void *d)) {
+            freeCallbackData_ = c;
+        }
 
 	protected:
-	void *callbackData_;
-	CustomOperator callbackOp_;
-	void (*freeCallbackData_)(void *data);
+        void *callbackData_;
+        CustomOperator callbackOp_;
+        void (*freeCallbackData_)(void *data);
 };
 
 inline

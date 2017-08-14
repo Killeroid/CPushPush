@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -42,16 +40,16 @@ int main(int argc, char* argv[])
 
     bool step = false;
     if (argc > 1 && string("step") == argv[1]) {
-	step = true;
-	if (argc > 2) {
-	    
-	    steps = atoi(argv[2]);
-	}
+        step = true;
+        if (argc > 2) {
+            
+            steps = atoi(argv[2]);
+        }
     }
  
     bool trace = false;
     if (argc > 1 && string("trace") == argv[1]) {
-	trace = true;
+        trace = true;
     }
     
     // to load extension libraries
@@ -62,11 +60,10 @@ int main(int argc, char* argv[])
     Env env;
     
     try {
-	code = parse(std::cin);
-    }
-    catch (exception& e) {
-	std::cout << print_config(env);
-	exit(0);
+        code = parse(std::cin);
+    } catch (exception& e) {
+        std::cout << print_config(env);
+        exit(0);
     }
     env = env.next();
 
@@ -81,31 +78,31 @@ int main(int argc, char* argv[])
     cout << "\n\n";
     
     while( not env.done() && r < steps) {
-	if (step) {
-	    r+= env.go(1);
-	    cout << env;
-	    env.print_exec_stack(cout);
-	    //cout << env.make_type() << endl;
-	    //cout << env.guard_size() << endl;
-	    cout << "\nEffort " << r; 
-	    cout << "\n\n";
-	}
-	else {
-	    if (trace) {
-		r += env.go_trace(steps, env_trace, &instructs, true);
-	    }
-	    else {
-		r += env.go(steps);
-	    }
-	}
+        if (step) {
+            r+= env.go(1);
+            cout << env;
+            env.print_exec_stack(cout);
+            //cout << env.make_type() << endl;
+            //cout << env.guard_size() << endl;
+            cout << "\nEffort " << r; 
+            cout << "\n\n";
+        } else {
+            if (trace) {
+                r += env.go_trace(steps, env_trace, &instructs, true);
+            } else {
+                r += env.go(steps);
+            }
+        }
     }
+    
     if (r >= steps) {
-	cout << "Bailed out after " << r << " execution steps" << endl;
+        cout << "Bailed out after " << r << " execution steps" << endl;
     }
+    
     if (trace) {
-	for (unsigned i = 0; i < env_trace.size(); ++i) {
-	    cout << i << ' ' << env_trace[i] << "\t\t" << instructs[i] << '\n';
-	}
+        for (unsigned i = 0; i < env_trace.size(); ++i) {
+            cout << i << ' ' << env_trace[i] << "\t\t" << instructs[i] << '\n';
+        }
     }
     
     cout << env;

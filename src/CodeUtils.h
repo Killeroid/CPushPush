@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -33,12 +31,12 @@ inline Code cons(Code a, Code b)
 {
     CodeArray stack = b->get_stack();
     
-    if (stack.size())
-	stack.push_back(a);
-    else {
-	stack.resize(2);
-	stack[0] = b;
-	stack[1] = a;
+    if (stack.size()) {
+        stack.push_back(a);
+    } else {
+        stack.resize(2);
+        stack[0] = b;
+        stack[1] = a;
     }
 
     return CodeList::adopt(stack); //Code( new CodeList(stack) );

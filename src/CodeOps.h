@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -83,10 +81,11 @@ inline unsigned _if(Env& env) {
     Code first = pop<Code>(env);
     Code second = pop<Code>(env);
 
-    if (pop<bool>(env)) 
-	env.push_guarded(second);
-    else
-	env.push_guarded(first);
+    if (pop<bool>(env)) {
+        env.push_guarded(second);
+    } else {
+        env.push_guarded(first);
+    }
     return 1;
 }
 
@@ -121,10 +120,11 @@ inline unsigned _append(Env& env) {
 }
 
 inline unsigned _atom(Env& env) {
-    if (pop<Code>(env)->get_stack().size()) 
-	push<bool>(env, false);
-    else
-	push<bool>(env, true);
+    if (pop<Code>(env)->get_stack().size()) {
+        push<bool>(env, false);
+    } else {
+        push<bool>(env, true);
+    }
 
     return 1;
 }
@@ -132,16 +132,16 @@ inline unsigned _atom(Env& env) {
 inline unsigned _car(Env& env) {
     
     if (top<Code>(env)->get_stack().size()) 
-	push<Code>(env, pop<Code>(env)->get_stack().back());
+        push<Code>(env, pop<Code>(env)->get_stack().back());
     return 1;
 }
 
 inline unsigned _cdr(Env& env) {
 
     if (top<Code>(env)->get_stack().size()) {
-	CodeArray stack = pop<Code>(env)->get_stack();
-	stack.pop_back();
-	push<Code>(env, CodeList::adopt(stack)); //Code(new CodeList(stack)));
+        CodeArray stack = pop<Code>(env)->get_stack();
+        stack.pop_back();
+        push<Code>(env, CodeList::adopt(stack)); //Code(new CodeList(stack)));
     }
 	
     return 1;
@@ -174,8 +174,8 @@ inline unsigned _extract(Env& env) {
     int val = pop<int>(env);
     
     if (code->size() == 0) { // nil
-	push(env, code);
-	return 1;
+        push(env, code);
+        return 1;
     }
 
     val = std::abs(val) % code->size();

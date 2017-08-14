@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -45,31 +43,31 @@ int Env::go(int n)
 
     // If the next environment still has work to do, continue that
     if (has_next() && not next().done()) {
-	effort += next().go(n);
+        effort += next().go(n);
     }
     
     // The basic pop-exec cycle
     while ( (not exec_stack.empty()) && (effort < n) ) {
-	Exec top = exec_stack.back();  
-	exec_stack.pop_back();
-	
-	//std::cerr << "Exec " << top.lock() << std::endl;
-	
-	/* // Debugging code
-	if (top->len() == 1) {
-	    const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
-	    if (ins) { 
-		
-		std::cerr << make_type() << ' ';
-		std::cerr << top.lock() << ' ' << ins->get_precondition() << std::endl;
-		
-	    }
-	}
-	else {
-	    std::cerr << make_type() << " effort " << effort << " Len " << top->len() << std::endl;
-	}*/
-	
-	effort += std::max(1u, (*top)(*this)); // execute instruction, every step takes at least one 
+        Exec top = exec_stack.back();
+        exec_stack.pop_back();
+        
+        //std::cerr << "Exec " << top.lock() << std::endl;
+        
+        /* // Debugging code
+        if (top->len() == 1) {
+            const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
+            if (ins) { 
+            
+            std::cerr << make_type() << ' ';
+            std::cerr << top.lock() << ' ' << ins->get_precondition() << std::endl;
+            
+            }
+        }
+        else {
+            std::cerr << make_type() << " effort " << effort << " Len " << top->len() << std::endl;
+        }*/
+        
+        effort += std::max(1u, (*top)(*this)); // execute instruction, every step takes at least one 
     }
     
     if (exec_stack.empty()) { guard.clear(); } // collect garbage
@@ -84,26 +82,26 @@ int Env::go_yield(int n)
 
     // If the next environment still has work to do, continue that
     if (has_next() && not next().done()) {
-	effort += next().go(n);
+        effort += next().go(n);
     }
     
     // The basic pop-exec cycle
     while ( (not exec_stack.empty()) && (++effort <= n) ) {
-	Exec top = exec_stack.back();  
-	exec_stack.pop_back();
-	
-	
-	// yield on error
-	if (top->len() == 1) {
-	    const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
+        Exec top = exec_stack.back();
+        exec_stack.pop_back();
+        
+        
+        // yield on error
+        if (top->len() == 1) {
+            const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
 
-	    if (ins && ins->can_run(*this)) { // check if it's a noop for reasons of stack contents
-		break;
-	    }
-	}
+            if (ins && ins->can_run(*this)) { // check if it's a noop for reasons of stack contents
+            break;
+            }
+        }
 
-	//effort += 
-	(*top)(*this); // execute instruction
+        //effort += 
+        (*top)(*this); // execute instruction
     }
     
     if (exec_stack.empty()) { guard.clear(); } // collect garbage
@@ -117,42 +115,42 @@ int Env::go_trace(int n, std::vector<Type>& trace, std::vector<Code>* ins_ptr, b
 
     // If the next environment still has work to do, continue that
     if (has_next() && not next().done()) {
-	effort += next().go_trace(n, trace);
+        effort += next().go_trace(n, trace);
     }
     
     // The basic pop-exec cycle
     while ( (not exec_stack.empty()) && (++effort <= n) ) {
-	Exec top = exec_stack.back();  
-	exec_stack.pop_back();
-	
-	bool instruction_ran = false;
-	if (top->len() == 1) {
-	    const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
+        Exec top = exec_stack.back();
+        exec_stack.pop_back();
+        
+        bool instruction_ran = false;
+        if (top->len() == 1) {
+            const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
 
-	    if (ins && ins->can_run(*this)) { // check if it's a noop for reasons of stack contents
-		instruction_ran = true;
-	    }
-	}
-	
-	(*top)(*this); // execute instruction
-	
-	if (instruction_ran) {
-	    trace.push_back( make_type());
-	    if (ins_ptr) {
-		ins_ptr->push_back(top.lock());
-	    }
-	}
-	
-	// yield on error
-	if (yield) {
-		if (top->len() == 1) {
-		const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );    
+            if (ins && ins->can_run(*this)) { // check if it's a noop for reasons of stack contents
+                instruction_ran = true;
+            }
+        }
+        
+        (*top)(*this); // execute instruction
+        
+        if (instruction_ran) {
+            trace.push_back( make_type());
+            if (ins_ptr) {
+                ins_ptr->push_back(top.lock());
+            }
+        }
+        
+        // yield on error
+        if (yield) {
+            if (top->len() == 1) {
+                const Instruction* ins = dynamic_cast<const Instruction*>( top.get() );
 
-		if (ins && ins->can_run(*this)) { // check if it's a noop for reasons of stack contents
-		    break;
-		}
-	    }
-	}
+                if (ins && ins->can_run(*this)) { // check if it's a noop for reasons of stack contents
+                    break;
+                }
+            }
+        }
     }
     
     if (exec_stack.empty()) { guard.clear(); } // collect garbage
@@ -168,7 +166,7 @@ Env& Env::next() {
 void Env::print_exec_stack(std::ostream& os)
 {
     for (std::vector<Exec>::reverse_iterator it = exec_stack.rbegin(); it != exec_stack.rend(); ++it) {
-	os << it->lock() << ' ';
+        os << it->lock() << ' ';
     }
 }
 
@@ -188,7 +186,7 @@ Type Env::make_type() const {
 
 static Env& RootEnv() { 
     if (detail::default_root_env_ptr == 0) 
-	detail::default_root_env_ptr = new Env();
+        detail::default_root_env_ptr = new Env();
     return *(detail::default_root_env_ptr); 
 }
 
@@ -212,27 +210,27 @@ std::string print(const Env& env) {
     
     os << "\t(";
     for (unsigned i = 0; i < env.int_stack.size(); ++i)
-	os << env.int_stack[i] << ' ';
+        os << env.int_stack[i] << ' ';
     os << ")\n";
 
     os << "\t(";
     for (unsigned i = 0; i < env.code_stack.size(); ++i)
-	os << env.code_stack[i] << ' ';
+        os << env.code_stack[i] << ' ';
     os << ")\n";
     
     os << "\t(";
     for (unsigned i = 0; i < env.bool_stack.size(); ++i)
-	os << (env.bool_stack[i]? "TRUE ":"FALSE ");
+        os << (env.bool_stack[i]? "TRUE ":"FALSE ");
     os << ")\n";
     
     os << "\t(";
     for (unsigned i = 0; i < env.double_stack.size(); ++i)
-	os << env.double_stack[i] << ' ';
+        os << env.double_stack[i] << ' ';
     os << ")\n";
 
     os << "\t(";
     for (unsigned i = 0; i < env.name_stack.size(); ++i)
-	os << print(env.name_stack[i]) << ' ';
+        os << print(env.name_stack[i]) << ' ';
     os << ")\n";
     
     
@@ -250,9 +248,10 @@ std::string print_config(const Env& env) {
 
     const CodeArray& ins = env.function_set->get_stack();
     
-    for (unsigned i = 0; i < ins.size(); ++i)
-	os << "\t\t" << ins[i] << "\n";
-    os << "\t)\n\tENV.INSTRUCTIONS\n\n";   
+    for (unsigned i = 0; i < ins.size(); ++i) {
+        os << "\t\t" << ins[i] << "\n";
+    }
+    os << "\t)\n\tENV.INSTRUCTIONS\n\n";
     
     os.precision(17);
     os.setf(std::ios_base::showpoint);

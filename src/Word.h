@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -34,10 +32,10 @@ class simple_name {
     simple_name(const simple_name&);
     
     public:
-    simple_name(unsigned nm) : index(nm) {}
-    ~simple_name() { destroy(index); }
-    
-    unsigned idx() const { return index; }
+        simple_name(unsigned nm) : index(nm) {}
+        ~simple_name() { destroy(index); }
+        
+        unsigned idx() const { return index; }
 };
 
 // define type of name

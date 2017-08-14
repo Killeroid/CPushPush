@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -31,7 +29,7 @@ void exec_define(Env& env, name_t name, Code code, bool set_writable = true) {
     
     // make sure 'lower envs' will use the same name/code binding
     if (env.has_next()) {
-	exec_define(env.next(), name, code, set_writable);
+        exec_define(env.next(), name, code, set_writable);
     }
 }
     
@@ -52,10 +50,10 @@ unsigned s(Env& env) {
     Exec z = pop<Exec>(env);
    
     if (z->size() + y->size() + 1 >= env.parameters.max_points_in_program) {
-	push(env, z);
-	push(env, y);
-	push(env, x);
-	return 1;
+        push(env, z);
+        push(env, y);
+        push(env, x);
+        return 1;
     }
     
     env.push_guarded( list( y.lock() ,z.lock() ) );
@@ -76,8 +74,8 @@ unsigned y(Env& env) {
     static Code ycode = parse("EXEC.Y");
     
     if (2 + x->size() >= env.parameters.max_points_in_program) {
-	push(env, x); // too big
-	return 1;
+        push(env, x); // too big
+        return 1;
     }
     
     env.push_guarded(list(ycode, x.lock()));
@@ -101,28 +99,28 @@ Code first_unbound_name(Code c, Env& env) {
     Literal<name_t>* name = dynamic_cast<Literal<name_t>* >(c.get());
 
     if (name != 0) {
-	Code code = get_code( name->get() );
-	
-	// create default code, how it will be return if there's no binding (TODO: create function default_code_for_name)
-	static Code name_quote = parse("NAME.QUOTE");
-	CodeArray vec(2);
-	vec[0] = c;
-	vec[1] = name_quote;
+        Code code = get_code( name->get() );
+        
+        // create default code, how it will be return if there's no binding (TODO: create function default_code_for_name)
+        static Code name_quote = parse("NAME.QUOTE");
+        CodeArray vec(2);
+        vec[0] = c;
+        vec[1] = name_quote;
 
-	CodeList def(vec);
+        CodeList def(vec);
 
-	if (def == *code) {
-	    return c; // found it
-	}
+        if (def == *code) {
+            return c; // found it
+        }
     }
     
     const CodeArray& vec = c->get_stack();
 
     for (int i = vec.size()-1; i >= 0; --i) {
-	Code res = first_unbound_name(vec[i], env);
-	if (res != nil) {
-	    return res;
-	}
+        Code res = first_unbound_name(vec[i], env);
+        if (res != nil) {
+            return res;
+        }
     }
 
     return nil;
@@ -130,17 +128,17 @@ Code first_unbound_name(Code c, Env& env) {
 
 Code replace_all(Code obj, Code name, Code to_insert) {
     if (*obj == *name) {
-	return to_insert;
+        return to_insert;
     }
 
     CodeArray vec = obj->get_stack();
 
     if (vec.size()) {
-	for (unsigned i = 0; i < vec.size(); ++i) {
-	    vec[i] = replace_all(vec[i], name, to_insert);
-	}
+        for (unsigned i = 0; i < vec.size(); ++i) {
+            vec[i] = replace_all(vec[i], name, to_insert);
+        }
 
-	return Code(new CodeList(vec));
+        return Code(new CodeList(vec));
     }
     // no list
     return obj;
@@ -148,30 +146,32 @@ Code replace_all(Code obj, Code name, Code to_insert) {
 
 class DoRangeClass : public CodeList {
     public:
-    DoRangeClass(const CodeArray& vec) : CodeList(vec) { assert(vec.size()==4); }
-    
-    unsigned operator()(Env& env) const {
+        DoRangeClass(const CodeArray& vec) : CodeList(vec) {
+            assert(vec.size()==4);
+        }
+        
+        unsigned operator()(Env& env) const {
 
-	CodeArray vec = get_stack();
-	
-	int i = static_cast<Literal<int>*>( vec[3].get() )->get();
-	int n = static_cast<Literal<int>*>( vec[2].get() )->get();
-	
-	int direction = 1;
-	if (i > n) direction = -1;
-	push(env, i);
-	
-	Exec code = Exec(vec[0]);
-	
-	if (i != n) {
-	    vec[3] = Code(new Literal<int>(i+direction));
-	    Code ranger = CodeList::adopt(vec); 
-	    env.push_guarded(ranger);
-	}	
-	
-	push(env, code);
-	return 1;
-    }
+            CodeArray vec = get_stack();
+            
+            int i = static_cast<Literal<int>*>( vec[3].get() )->get();
+            int n = static_cast<Literal<int>*>( vec[2].get() )->get();
+            
+            int direction = 1;
+            if (i > n) direction = -1;
+            push(env, i);
+            
+            Exec code = Exec(vec[0]);
+            
+            if (i != n) {
+                vec[3] = Code(new Literal<int>(i+direction));
+                Code ranger = CodeList::adopt(vec); 
+                env.push_guarded(ranger);
+            }	
+            
+            push(env, code);
+            return 1;
+        }
 };
 
 

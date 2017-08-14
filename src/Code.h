@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -119,10 +117,10 @@ class CodeList : public CodeBase
     
     // special 'constructor' that will destroy the argument (for efficiency reasons)
     static Code adopt(CodeArray& vec) { // beware, destructs vec! 
-	CodeList* lst = new CodeList;
-	lst->_stack.swap(vec); // destructs vec
-	lst->calc_sizes();
-	return Code(lst);
+        CodeList* lst = new CodeList;
+        lst->_stack.swap(vec); // destructs vec
+        lst->calc_sizes();
+        return Code(lst);
     }
 };
 

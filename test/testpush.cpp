@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -38,14 +36,14 @@ int main()
     push_call(env, code);
     unsigned r = 0;
     while( not env.done()) {
-	r += env.go(1000);
+        r += env.go(1000);
     }
     
     vector<bool>& stack = get_stack<bool>(env);
     if (stack.empty() || stack.back() == false) {
-	cout << code << endl;
-	cout << env;
-	return 1;
+        cout << code << endl;
+        cout << env;
+        return 1;
     }
     return 0;
 }

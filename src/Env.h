@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -54,146 +52,146 @@ extern const Parameters global_parameters;
 
 class Env {
     public:
-	/* Gets the default environment, can be a subclass of Env (see StaticInit:set_root_env()) */
-	static Env& getRootEnv();
+        /* Gets the default environment, can be a subclass of Env (see StaticInit:set_root_env()) */
+        static Env& getRootEnv();
 
-	/* instructions */
-	Code function_set;
-	Parameters parameters;
+        /* instructions */
+        Code function_set;
+        Parameters parameters;
 	
     private:
-	std::list<Code> guard; // guard, keep Code alive while executing 
+        std::list<Code> guard; // guard, keep Code alive while executing
 
     public:
-	void push_guarded(const Code& code) { 
-	    guard.push_back(code); 
-	    exec_stack.push_back(Exec(code)); 
-	}
-    	
-	void print_exec_stack(std::ostream& os);
-	unsigned exec_stack_size() const { return exec_stack.size(); }
-	unsigned guard_size() const { return guard.size(); }
-	
-	/* Stacks */
-	std::vector<Exec>	  exec_stack;
-	std::vector<int>          int_stack;
-	std::vector<Code>         code_stack;
-	std::vector<bool>         bool_stack;
-	std::vector<double>       double_stack;
-	std::vector<name_t>	  name_stack;
-	
-	/* Support for names */
-	bool quote_name_flag;
-	
-	/* embedded environment */
-	Env* next_env;
-	Env& next();
-	bool has_next() const { return next_env != 0; }
+        void push_guarded(const Code& code) {
+            guard.push_back(code); 
+            exec_stack.push_back(Exec(code)); 
+        }
+            
+        void print_exec_stack(std::ostream& os);
+        unsigned exec_stack_size() const { return exec_stack.size(); }
+        unsigned guard_size() const { return guard.size(); }
+        
+        /* Stacks */
+        std::vector<Exec>	  exec_stack;
+        std::vector<int>          int_stack;
+        std::vector<Code>         code_stack;
+        std::vector<bool>         bool_stack;
+        std::vector<double>       double_stack;
+        std::vector<name_t>	  name_stack;
+        
+        /* Support for names */
+        bool quote_name_flag;
+        
+        /* embedded environment */
+        Env* next_env;
+        Env& next();
+        bool has_next() const { return next_env != 0; }
 
-	
-	name_t insert_string(std::string name) {
-	    return lookup(name);
-	}
+        
+        name_t insert_string(std::string name) {
+            return lookup(name);
+        }
 
-	Env(unsigned _reserve=1000) : function_set(instructions), parameters(global_parameters)
-	{
-	    reserve(_reserve);
-	    next_env=0;
-	    quote_name_flag = false;
-	    clear();
-	}
-	
-	virtual ~Env(){ delete next_env; }
-	
-	Env(const Env& oth) : next_env(0) {
-	    operator=(oth);
-	}
-	
-	Env& operator=(const Env& oth) {
-	    
-	    function_set = oth.function_set;
-	    parameters = oth.parameters;
-	    exec_stack = oth.exec_stack;
-	    guard = oth.guard;
-	    int_stack = oth.int_stack;
-	    code_stack = oth.code_stack;
-	    bool_stack = oth.bool_stack;
-	    double_stack = oth.double_stack;
-	    name_stack = oth.name_stack;
-	
-	    quote_name_flag = oth.quote_name_flag;
+        Env(unsigned _reserve=1000) : function_set(instructions), parameters(global_parameters)
+        {
+            reserve(_reserve);
+            next_env=0;
+            quote_name_flag = false;
+            clear();
+        }
+        
+        virtual ~Env(){ delete next_env; }
+        
+        Env(const Env& oth) : next_env(0) {
+            operator=(oth);
+        }
+        
+        Env& operator=(const Env& oth) {
+            
+            function_set = oth.function_set;
+            parameters = oth.parameters;
+            exec_stack = oth.exec_stack;
+            guard = oth.guard;
+            int_stack = oth.int_stack;
+            code_stack = oth.code_stack;
+            bool_stack = oth.bool_stack;
+            double_stack = oth.double_stack;
+            name_stack = oth.name_stack;
+        
+            quote_name_flag = oth.quote_name_flag;
 
-	    delete next_env;
-	    next_env = 0;
-	    if (oth.next_env) {
-		next_env = oth.next_env->clone();
-	    }
-	    
-	    return *this;
-	}
-	
-	virtual Env* clone() const {
-	    Env* newenv = new Env(*this);
-	    return newenv;
-	}
-	
-	void clear() {
-	    clear_stacks();
-	    quote_name_flag = false;
-	}
-	
-	void configure(Code code);
-	
-	virtual void reserve(unsigned _reserve)
-	{
-	    exec_stack.reserve(_reserve);
+            delete next_env;
+            next_env = 0;
+            if (oth.next_env) {
+                next_env = oth.next_env->clone();
+            }
+            
+            return *this;
+        }
+        
+        virtual Env* clone() const {
+            Env* newenv = new Env(*this);
+            return newenv;
+        }
+        
+        void clear() {
+            clear_stacks();
+            quote_name_flag = false;
+        }
+        
+        void configure(Code code);
+        
+        virtual void reserve(unsigned _reserve)
+        {
+            exec_stack.reserve(_reserve);
 
-	    int_stack.reserve(_reserve);
-	    code_stack.reserve(_reserve);
-	    bool_stack.reserve(_reserve);
-	    double_stack.reserve(_reserve);
-	    name_stack.reserve(_reserve);
-	}
-	
-	virtual void clear_stacks() {
-	    
-	    exec_stack.clear();
-	    guard.clear();
-	    
-	    int_stack.clear();
-	    code_stack.clear();
-	    bool_stack.clear();
-	    double_stack.clear();
-	    name_stack.clear();
-	}
+            int_stack.reserve(_reserve);
+            code_stack.reserve(_reserve);
+            bool_stack.reserve(_reserve);
+            double_stack.reserve(_reserve);
+            name_stack.reserve(_reserve);
+        }
+        
+        virtual void clear_stacks() {
+            
+            exec_stack.clear();
+            guard.clear();
+            
+            int_stack.clear();
+            code_stack.clear();
+            bool_stack.clear();
+            double_stack.clear();
+            name_stack.clear();
+        }
 
-	/* Needed for type checking of preconditions */
-	virtual unsigned get_stack_size(int which) const {
-	    switch (which) {
-		case EXEC_STACK: return exec_stack.size();
-		case INTEGER_STACK: return int_stack.size();
-		case CODE_STACK: return code_stack.size();
-		case BOOL_STACK: return bool_stack.size();
-		case FLOAT_STACK: return double_stack.size();
-		case NAME_STACK: return name_stack.size();
-	    }
-	    return 0;
-	}
-	
-	virtual Type make_type() const;
-	
-	/* Needed for type based packing */
-	virtual Code pop_stack_from_id(int id);
+        /* Needed for type checking of preconditions */
+        virtual unsigned get_stack_size(int which) const {
+            switch (which) {
+                case EXEC_STACK: return exec_stack.size();
+                case INTEGER_STACK: return int_stack.size();
+                case CODE_STACK: return code_stack.size();
+                case BOOL_STACK: return bool_stack.size();
+                case FLOAT_STACK: return double_stack.size();
+                case NAME_STACK: return name_stack.size();
+            }
+            return 0;
+        }
+        
+        virtual Type make_type() const;
+        
+        /* Needed for type based packing */
+        virtual Code pop_stack_from_id(int id);
 
-	/* exception handling */
-	/* might want to add an 'exception' stack at some point */
-	void error() {}
-	
-	bool done()        { return exec_stack.empty();  }
-	int go(int n = 50); 
-	int go_yield(int n = 50); 
-	
-	int go_trace(int n, std::vector<Type>& trace, std::vector<Code>* ins_ptr = 0, bool yield = false);
+        /* exception handling */
+        /* might want to add an 'exception' stack at some point */
+        void error() {}
+        
+        bool done()        { return exec_stack.empty();  }
+        int go(int n = 50); 
+        int go_yield(int n = 50); 
+        
+        int go_trace(int n, std::vector<Type>& trace, std::vector<Code>* ins_ptr = 0, bool yield = false);
 	
 };
     
@@ -231,8 +229,8 @@ inline void push_call(Env& env, Code code) {
 template <typename T>
 inline bool has_elements(Env& env, unsigned sz) { 
     if (get_stack<T>(env).size() < sz) {
-	env.error();
-	return false;
+        env.error();
+        return false;
     }
     return true;
 }

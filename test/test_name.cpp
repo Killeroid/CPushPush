@@ -1,7 +1,5 @@
 
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -36,10 +34,11 @@ int main()
     Code code = parse("(fib : fib)");
    
     {
-	Env env;
-	push_call(env, code);
-	env.go(100);
+        Env env;
+        push_call(env, code);
+        env.go(100);
     }
+    
     if (dict_size() != 1) return 1;
 
     collect_garbage();
@@ -53,10 +52,10 @@ int main()
     
     code = parse("(foo : bar bar : (foo bar) )");
     {
-	Env env;
-	push_call(env, code);
-	env.go(100);
-	cout << env << endl;
+        Env env;
+        push_call(env, code);
+        env.go(100);
+        cout << env << endl;
     }
 
     if (dict_size() != 2) return 1;
@@ -73,9 +72,9 @@ int main()
     code = parse("(foo : bar bar : baz baz : (foo baz) )");
     
     {
-	Env env;
-	push_call(env, code);
-	env.go(100);
+        Env env;
+        push_call(env, code);
+        env.go(100);
     }
 
     Code baz = parse("baz");
@@ -102,8 +101,8 @@ int main()
     collect_garbage();
    
     if (dict_size() != 2) {
-	cout << "Err: dict size = " << endl;
-	return 1;
+        cout << "Err: dict size = " << endl;
+        return 1;
     }
    
     code = nil;

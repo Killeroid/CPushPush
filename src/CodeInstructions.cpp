@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -41,20 +39,20 @@ unsigned code_do_range(Env& env) {
     push(env, i);
     if (i != n) {
     
-	i += direction;
-	    
-	CodeArray vec(5);
-	static Code quote   = parse("CODE.QUOTE");
-	static Code DoRange = parse("CODE.DO*RANGE");
-	
-	vec[0] = DoRange;
-	vec[1] = code;
-	vec[2] = quote;
-	vec[3] = Code(new Literal<int>(n));
-	vec[4] = Code(new Literal<int>(i));
+        i += direction;
+            
+        CodeArray vec(5);
+        static Code quote   = parse("CODE.QUOTE");
+        static Code DoRange = parse("CODE.DO*RANGE");
+        
+        vec[0] = DoRange;
+        vec[1] = code;
+        vec[2] = quote;
+        vec[3] = Code(new Literal<int>(n));
+        vec[4] = Code(new Literal<int>(i));
 
-	env.push_guarded( CodeList::adopt(vec)); //Code(new CodeList(vec)));
-	
+        env.push_guarded( CodeList::adopt(vec)); //Code(new CodeList(vec)));
+        
 	
     }
     env.push_guarded(code);

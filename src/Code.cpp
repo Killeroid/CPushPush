@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -40,7 +38,7 @@ CodeList::CodeList(Code a)  {
 unsigned CodeList::operator()(Env& env) const
 {
     for (CodeArray::const_iterator it = _stack.begin(); it!=_stack.end(); ++it) 
-	env.exec_stack.push_back(Exec(*it));
+        env.exec_stack.push_back(Exec(*it));
     return 1;
 }
 
@@ -48,15 +46,15 @@ void CodeList::calc_sizes() {
     _size = 1;
     _binary_size = _stack.size() - 1; // internal nodes
     for (CodeArray::const_iterator it = _stack.begin(); it != _stack.end(); ++it) {
-	_size += (*it)->size();
-	_binary_size += (*it)->binary_size();
+        _size += (*it)->size();
+        _binary_size += (*it)->binary_size();
     }
 }
 
 std::string CodeList::to_string() const {
     std::string r = "(";
     for (int i = _stack.size()-1; i >= 0; --i) {
-	r += _stack[i]->to_string() + (i==0? "": " ");
+        r += _stack[i]->to_string() + (i==0? "": " ");
     }
     r += ")";
     return r;
@@ -80,7 +78,7 @@ bool CodeBase::operator==(const CodeBase& b) const
     const CodeArray& bstack = b.get_stack();
     
     for (unsigned i = 0; i < astack.size(); ++i) { 
-	if (!(*astack[i] == *bstack[i]) ) return false; 
+        if (!(*astack[i] == *bstack[i]) ) return false; 
     }
     
     return a.equal_to(b);
@@ -99,16 +97,16 @@ bool smaller(Code a, Code b) {
     const CodeArray& bs = b->get_stack();
 
     if (as.size() == 0) {
-	return a.get() < b.get(); // pointer compare, atoms are unique (hmm, except constantcode...)
+        return a.get() < b.get(); // pointer compare, atoms are unique (hmm, except constantcode...)
     }
 
     for (unsigned i = 0; i < as.size(); ++i) {
-	Code suba = as[i];
-	Code subb = bs[i];
+        Code suba = as[i];
+        Code subb = bs[i];
 
-	if (!equal_to(suba, subb)) {
-	    return smaller(suba, subb);
-	}
+        if (!equal_to(suba, subb)) {
+            return smaller(suba, subb);
+        }
     }
 
     return false;

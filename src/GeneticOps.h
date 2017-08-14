@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -44,9 +42,9 @@ inline unsigned subtree_xover(Env& env) {
     // if this pushes over the size limit, don't do it
 
     if(child->size() >= (unsigned) env.parameters.max_points_in_program) {
-	push(env, mom);
+        push(env, mom);
     } else {
-	push(env, child);
+        push(env, child);
     }
 
     return 1;
@@ -64,9 +62,9 @@ inline unsigned subtree_binary_xover(Env& env) {
     Code child = insert_binary(mom, r1, extract_binary(dad, r2));
 
     if(child->size() > (unsigned) env.parameters.max_points_in_program) {
-	push(env, mom);
+        push(env, mom);
     } else {
-	push(env, child);
+        push(env, child);
     }
 
     return 1;
@@ -86,9 +84,9 @@ inline unsigned subtree_mutation(Env& env) {
     newcode = insert(code,r1,newcode); 
 
     if(newcode->size() >= (unsigned) env.parameters.max_points_in_program) {
-	push(env, code);
+        push(env, code);
     } else {
-	push(env, newcode); 
+        push(env, newcode);
     }
     
     return 1;
@@ -114,8 +112,9 @@ inline unsigned subtree_fair_mutation(Env& env) {
 
 	env.parameters.max_points_in_random_expression = subSize + offset;
 
-	if(env.parameters.max_points_in_random_expression < 1) 
+    if(env.parameters.max_points_in_random_expression < 1) {
 		env.parameters.max_points_in_random_expression = 1;
+    }
 
 	env.clear_stacks();
 

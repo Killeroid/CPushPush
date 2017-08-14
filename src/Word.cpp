@@ -1,6 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Maarten Keijzer                                 *
- *   mkeijzer@xs4all.nl                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -66,7 +64,7 @@ void expand() {
     globals.resize(newsize);
     free_idx.reserve(newsize-org_size);
     for (unsigned i = org_size; i < globals.size(); ++i) {
-	free_idx.push_back(i);
+        free_idx.push_back(i);
     }
 }
 
@@ -83,10 +81,10 @@ void destroy(unsigned idx) {
 name_t lookup(std::string name) {
     // lookup is O(n) (only used when parsing)
     for (std::list<unsigned>::iterator it = used_idx.begin(); it != used_idx.end(); ++it) {
-	unsigned idx = *it;
-	if (globals[idx].name == name) { // found
-	    return globals[idx].reference.lock();
-	}
+        unsigned idx = *it;
+        if (globals[idx].name == name) { // found
+            return globals[idx].reference.lock();
+        }
     }
     // create new name
 
@@ -138,8 +136,8 @@ name_t rand_bound_name() {
     std::list<unsigned>::iterator it = used_idx.begin();
 
     for(;;) {
-	if (choice-- == 0) return globals[ *it ].reference.lock();
-	++it;
+        if (choice-- == 0) return globals[ *it ].reference.lock();
+        ++it;
     }
    
     // cannot happen
@@ -153,10 +151,10 @@ Code get_code(name_t name) {
     static Code quote = parse("NAME.QUOTE");
     
     if (info.unset) {
-	vector<Code> code(2);
-	code[0] = Code( new Literal<name_t>(name)); 
-	code[1] = quote;
-	return Code( new CodeList(code) );
+        vector<Code> code(2);
+        code[0] = Code( new Literal<name_t>(name)); 
+        code[1] = quote;
+        return Code( new CodeList(code) );
     }
     
     return info.binding;
@@ -172,13 +170,13 @@ void remove_refs(vector<int>& v, Code code) {
     const Literal<name_t>* l = dynamic_cast<const Literal<name_t>* >( code.get() );
 
     if (l != 0) {
-	unsigned idx = l->get()->idx();
-	v[idx]--;
+        unsigned idx = l->get()->idx();
+        v[idx]--;
     }
     
     const CodeArray& stack = code->get_stack();
     for (unsigned i = 0; i < stack.size(); ++i) {
-	remove_refs(v,stack[i]);
+        remove_refs(v,stack[i]);
     }
 }
 
@@ -188,18 +186,18 @@ void collect_garbage() {
 
     vector<int> refc(globals.size());
     for (unsigned i = 0; i < refc.size(); ++i) {
-	refc[i] += globals[i].refcount();	// get the refcount
-	remove_refs(refc, globals[i].binding);  // remove those references that are referred to by the code
+        refc[i] += globals[i].refcount();	// get the refcount
+        remove_refs(refc, globals[i].binding);  // remove those references that are referred to by the code
     }
   
     // if there are still non-zero references, these must be from 'live' references
     for (unsigned i = 0; i < refc.size(); ++i) {
-	if (globals[i].name == "") continue;
+        if (globals[i].name == "") continue;
 
-	if (refc[i] == 0) { // sweep
-	    destroy(i);
-	}
-	assert(refc[i] >= 0);
+        if (refc[i] == 0) { // sweep
+            destroy(i);
+        }
+        assert(refc[i] >= 0);
     }
 }
 
