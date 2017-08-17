@@ -10,6 +10,7 @@ config.h
 src/runpush
 examples/pushgp_int
 examples/inputs/CVS
+autom4te.cache
 
 
 #############################

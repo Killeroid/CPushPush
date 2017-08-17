@@ -1,8 +1,11 @@
 AC_INIT
 AC_CONFIG_SRCDIR([configure.in])
 
+AC_CONFIG_MACRO_DIR([m4])
+AX_CXX_COMPILE_STDCXX(11, [noext], [mandatory])
+
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE(push, 3.1.0)
+AM_INIT_AUTOMAKE(cpushpush, 3.1.0)
 
 AC_LANG([C++])
 AC_PROG_CXX
