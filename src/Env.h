@@ -204,7 +204,7 @@ inline std::ostream& operator<<(std::ostream& os, const Env& env) { os << print(
 void internal_error( std::string s );
 
 /* Operations */
-template <typename T> inline std::vector<T>& get_stack(Env& env)	{ }
+template <typename T> inline std::vector<T>& get_stack(Env& env)	{ return get_stack<T>(env); }
 template <> inline std::vector<Exec>&   get_stack(Env& env)	{ return env.exec_stack; }
 template <> inline std::vector<int>& get_stack(Env& env)	{ return env.int_stack;  }
 template <> inline std::vector<double>& get_stack(Env& env)	{ return env.double_stack; }
