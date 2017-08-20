@@ -1,3 +1,6 @@
+#if defined(__GNUC__) && !defined(__clang__)
+#include "string.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
