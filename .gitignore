@@ -12,6 +12,10 @@ examples/pushgp_int
 examples/inputs/CVS
 autom4te.cache
 
+## Debug symbols
+*.dSYM
+
+
 
 #############################
 # Intermediary build files  #
